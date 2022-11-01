@@ -1,0 +1,126 @@
+  
+Public GNSSSampleDur, PCOnTime = 0, PCOnThresh = 60, ShutdownCnt, GNSSUserTime = 90, GPSOnTime = 0, GPSOnThresh = 60
+  Public PCSig As String * 30
+  Public PCSendStr As String * 50
+  Public PCReadyFlag As Boolean = False
+  Public ManualSampleGNSS As Boolean = False
+  Public UpdateGNSSDur As Boolean = False
+  Public AutoSampleGNSS As Boolean = False
+  Public PowerPC As Boolean = False
+  Public RunCompleteFlag As Boolean = False
+  Public ManualPCPwr As Boolean = False
+  Public ManualGPSPwr As Boolean = False
+  Public ShutdownBool As Boolean = False
+  Public ForcePCShutdown As Boolean = False
+  Public EndGNSSsample As Boolean = False
+
+  Const PCSwitch = U7
+  Const PCComPort = ComU9
+
+  Sub RunGNSS
+    If IfTime(0,3,Hr) AND ManualPCPwr = False Then
+	    AutoSampleGNSS = True
+	    PowerPC = True
+	    ManualPCPwr = False
+	    SW12(2,1)
+	    PortSet(PCSwitch,1)
+	  EndIf
+	  If ManualPCPwr = True Then
+	    PortSet(PCSwitch,1)
+	    PCOnTime = PCOnTime + 1
+	  EndIf
+	  If ManualGPSPwr = True Then
+	    SW12(2,1)
+	    GPSOnTime = GPSOnTime + 1
+	    If GPSOnTime >= GPSOnThresh AND ManualSampleGNSS = False AND AutoSampleGNSS = False Then
+	      SW12(2,0)
+	      ManualGPSPwr = False
+	      GPSOnTime = 0
+	    EndIf
+	  EndIf
+	  If ManualSampleGNSS = True Then
+	    ManualPCPwr = True
+	    ManualGPSPwr = True
+	  EndIf
+	    
+	  If ShutdownBool = True Then
+	    PCSendStr = "Shutdown"
+	    SerialOut(PCComPort,PCSendStr,"",1,0)
+	    ShutdownCnt = ShutdownCnt + 1
+	    If ShutdownCnt >= 5 Then
+	      PortSet(PCSwitch,0)
+	      SW12(2,0)
+	      PowerPC = False
+	      ManualPCPwr = False
+	      ManualGPSPwr = False
+	      ShutdownBool = False
+	      PowerPC = False
+	      ForcePCShutdown = False
+	      AutoSampleGNSS = False
+	      ManualSampleGNSS = False
+	      RunCompleteFlag = False
+	      PCReadyFlag = False
+	      PCSig = ""
+	      PCSendStr = ""
+	      PCOnTime = 0
+	      ShutdownCnt = 0
+	    EndIf
+	  EndIf
+	  GNSSSampleDur = GNSSUserTime * 60 
+	  SerialIn(PCSig,PCComPort,50,13,30)
+	  SerialFlush(PCComPort)
+	  Trim(PCSig)
+	  If PCSig = "Ready" Then
+	    PCReadyFlag = True
+	    If ManualSampleGNSS = True OR AutoSampleGNSS = True Then
+	    PCSendStr = "SID:" + SiteID + "," + SiteNum + "," + GNSSUserTime + CHR(10)
+	    SerialOut(PCComPort,PCSendStr,"",1,0)
+	    PCSig = ""
+	    PCSendStr = ""
+	    Else
+	    PCSendStr = "No Sample"
+	    SerialOut(PCComPort,PCSendStr,"",1,0)
+	    EndIf
+	  EndIf
+	  If PCSig = "Sample Info Received" Then
+	    UpdateGNSSDur = False
+	  EndIf
+	  If PCReadyFlag = True Then
+	    If UpdateGNSSDur = True Then
+	      ManualSampleGNSS = True
+	      PCSendStr = "SID:" + SiteID + "," + SiteNum + "," + GNSSUserTime + CHR(10)
+	      SerialOut(PCComPort,PCSendStr,"",1,0)
+	    EndIf
+	  EndIf
+	  If PCSig = "Run Complete" AND AutoSampleGNSS = True AND ManualSampleGNSS = False Then
+	    PCSendStr = "Shutdown"
+	    SerialOut(PCComPort,PCSendStr,"",1,0)
+	    ShutdownBool = True
+	    ShutdownCnt = 0
+	    ManualSampleGNSS = False
+	    AutoSampleGNSS = False
+	    RunCompleteFlag = True
+	    PCSig = ""
+	    PCSendStr = ""
+	  ElseIf PCSig = "Run Complete" AND AutoSampleGNSS = False AND UpdateGNSSDur = False Then
+	    RunCompleteFlag = True
+	    ManualSampleGNSS = False
+	  EndIf
+	  If EndGNSSsample = True Then
+	    PCSendStr = "End Sample"
+	    SerialOut(PCComPort,PCSendStr,"",1,0)
+	    ManualSampleGNSS = False
+	    AutoSampleGNSS = False
+	    EndGNSSsample = False
+	    PCSig = ""
+	    PCSendStr = ""
+    EndIf	    
+	  If (PCOnTime >= PCOnThresh AND ManualPCPwr = True AND RunCompleteFlag = True) OR ForcePCShutdown  = True Then
+	    If ShutdownBool = False Then
+	      ShutdownBool = True
+	      ShutdownCnt = 0
+	      PCSig = ""
+	      PCSendStr = ""
+	    EndIf
+	  EndIf
+	EndSub
