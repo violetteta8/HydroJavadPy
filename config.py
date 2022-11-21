@@ -4,3 +4,4 @@ ComB = 'COM30'
 BaudB = 115200
 Site = 'Test'
 SiteNumber = '12345678'
+User = 'tviolett'

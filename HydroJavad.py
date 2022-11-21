@@ -1,6 +1,10 @@
+import sys
+
+sys.path.insert(0,'C:\\Users\\tviolett\\Documents\\GitLab\\HydroJavadPy\\')
+
 import logging
 import serial
-from config import ComA, BaudA, ComB, BaudB, Site, SiteNumber
+from config import ComA, BaudA, ComB, BaudB, Site, SiteNumber, User
 import time
 from datetime import datetime
 import os

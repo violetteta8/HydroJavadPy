@@ -1,5 +1,4 @@
-  
-Public GNSSSampleDur, PCOnTime = 0, PCOnThresh = 60, ShutdownCnt, GNSSUserTime = 90, GPSOnTime = 0, GPSOnThresh = 60
+  Public GNSSSampleDur, PCOnTime = 0, PCOnThresh = 60, ShutdownCnt, GNSSUserTime = 90, GPSOnTime = 0, GPSOnThresh = 60
   Public PCSig As String * 30
   Public PCSendStr As String * 50
   Public PCReadyFlag As Boolean = False
