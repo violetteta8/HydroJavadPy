@@ -3,8 +3,6 @@ import os
 from datetime import datetime
 from config import Site, SiteNumber
 
-
-
 def CheckWY():
     global wateryear
     currentyear = datetime.now().year
@@ -55,7 +53,7 @@ def sftpConnect(path):
         remotepath = ftp.getcwd()
         print(remotepath)
 
-    for files in os.listdir(path):       # For the files in the local directory
-        if files.endswith('o'):
-            ftp.put(path + files,remotepath + '/' + files)
+    for file in os.listdir(path):       # For the files in the local directory
+        if file.endswith('o'):
+            ftp.put(path + file,remotepath + '/' + file)
     ftp.close()

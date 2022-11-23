@@ -2,6 +2,10 @@ import sys
 
 sys.path.insert(0,'C:\\Users\\tviolett\\Documents\\GitLab\\HydroJavadPy\\')
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 import logging
 import serial
 from config import ComA, BaudA, ComB, BaudB, Site, SiteNumber, User
@@ -11,10 +15,91 @@ import os
 import shutil
 import ftplib
 import sftp
+from OPUSh import push_file, get_file_age_in_weeks
+
+def get_file_age_in_weeks(file_path):
+    #file_path = os.path.join(path, file)
+    file_time = os.path.getmtime(file_path)
+    file_age = datetime.now().timestamp() - file_time
+    file_age_weeks = file_age/604800
+    print(file_age_weeks)
+    if file_age_weeks >= 0:
+        print('File is older than 2 weeks')
+        print(file_path)
+        push_file(file_path)
+        print('File has been pushed')
+    else:
+        print('File is younger than 2 weeks')
+        print(file_path)
+        print('File has not been pushed')
+
+def push_file(file_path):
+    driver = webdriver.Chrome('/usr/local/bin/chromedriver')
+    action = ActionChains(driver)
+    driver.get('https://geodesy.noaa.gov/OPUS/')
+    time.sleep(8)
+    #click "choose file" button with action chains
+    driver.find_element(By.NAME, 'uploadfile').send_keys(file_path)
+
+    #enter information in drop down menu
+    elem = driver.find_element(By.ID, 'select2-ant_type-container').click()
+    action.send_keys('JAVTRIUMPH_2A+P JVGR').perform()
+    time.sleep(2)
+    action.send_keys(Keys.ENTER).perform()
+    time.sleep(1)
+    #enter email address
+    driver.find_element(By.NAME, 'email_address').send_keys('tviolette@usgs.gov')
+    time.sleep(1)
+    driver.find_element(By.NAME, 'Options').click()
+    time.sleep(1)
+    driver.find_element(By.NAME, 'SolutionFormat').click()
+    action.send_keys(Keys.ARROW_DOWN).perform()
+    time.sleep(1)
+    action.send_keys(Keys.ARROW_DOWN).perform()
+    time.sleep(1)
+    action.send_keys(Keys.ENTER).perform()
+    time.sleep(1)
+    driver.find_element(By.NAME, 'Static').click()
+    #if multiple alert boxes appears click OK in alert box
+    try:
+        alert = driver.switch_to.alert
+        alert.accept()
+        print("alert accepted")
+    except:
+        print("no alert")
+    try:
+        alert = driver.switch_to.alert
+        alert.accept()
+        print("alert accepted")
+    except:
+        print("no alert")
+    try:
+        alert = driver.switch_to.alert
+        alert.accept()
+        print("alert accepted")
+    except:
+        print("no alert")
+    
+    #read text from next webpage
+    time.sleep(5)
+    text = driver.find_element(By.ID, 'container').text
+    print(text)
+#if text contains "upload successful" then remove extension from filename
+    if 'Upload successful' in text:
+        print('Upload successful')
+        file = os.path.splitext(file_path)[0]
+        ext = os.path.splitext(file_path)[1]
+        os.rename(file_path, file + '_uploaded' + ext)
+        print('File has been renamed')
+    else:
+        print('Upload unsuccessful')
+        #store error to log file
+        logging.error(text)
+    driver.close()
 
 global path
-currentmonth = datetime.now().month
 
+currentmonth = datetime.now().month
 wateryear = sftp.CheckWY()
 
 path = 'C:\\Users\\tviolett\\Documents\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'                # Define path for data storage
@@ -44,7 +129,7 @@ else:
     logging.info(msg)
 
 
-timestr = time.strftime("%Y%m%d-%H%M")   
+timestr = time.strftime("%Y%m%d_%H%M")  #opus won't accept hyphens in file name 
 SampleDur = 0                                                               # Declare variable to hold user-defined sample duration
 SampleGNSS = 1
 TestStr = ""
@@ -55,12 +140,7 @@ StationNum = 0
 ShutdownStr = ''
 shutdown = 'False'
 
-try:
-    ser = serial.Serial(ComA,BaudA)
-    logging.info('Serial port A Opened')
-except:
-    logging.exception('Serial Port A Not Available')
-
+#open serial port to data logger
 try:
     ser2 = serial.Serial(ComB,BaudB)
     logging.info('Serial port B Opened')
@@ -111,11 +191,16 @@ while SampleDur == 0 and (SampleGNSS != 0 or SampleGNSS != -1):                 
 
 if SampleGNSS == -1:
 
-    #SID = SID.decode("utf-8")
-    #StationNum = StationNum.decode("utf-8")
     SampleDur = int(SampleDur)
 
-                                   # Create timestamp string for file naming
+#only open serial port if we are going to sample
+    try:
+        ser = serial.Serial(ComA,BaudA)
+        logging.info('Serial port A Opened')
+    except:
+        logging.exception('Serial Port A Not Available')
+
+# Create timestamp string for file naming
     fn = SiteNumber + "_" + Site + "_Javad_"                                                           # Define site ID for file naming -- Do this via communication to datalogger?
     ext = ".jps"                                                                # Set raw file name extension from Javad to .jps
     jpsname = fn + timestr + ext                                                # Concatenate to make file name
@@ -152,22 +237,14 @@ if SampleGNSS == -1:
     logging.info(numFiles + ' files to push to FTP.')                                         # Print the number of OPUS files
     if numfiles >= 1:                                                            # If more than X -- perhaps always send after every sample period instead of waiting for multiple files? Unless user starts manually?
         sftp.sftpConnect(path)
-        #ftp = ftplib.FTP(ftp_host, ftp_user, ftp_pass)                          # Open connection to USGS public FTP server
-        #ftp.cwd('from_pub/wr/GCES_GNSS')                                        # Move into the server to appropriate directory for file storage
-        #for files in os.listdir(path):       # For the files in the local directory
-         #   if files.endswith('o'):                                             # If the file extension ends in "o" (OPUS file)
-          #      ftpResponse = ftp.storbinary('STOR ' + files, open(path + files,"rb")) # Send the "STOR" command to send files to the FTP
-           #     print(ftpResponse)
-            #    if ftpResponse == ("226 Transfer complete."):
-             #       os.remove(path + files)
-              #      print('File Deleted')
-                #    logging.info(path + files + ' deleted.')
-               # else:
-                #    print('Unsuccessful transfer, file not deleted.')
-                 #   logging.info(path + files + ' not deleted.')
-                  #  continue
-           # else:                                                               # If no more "o" files
-            #    continue                                                        # Move on
+        
+
+for file in os.listdir(path):
+    if file.endswith("o"):
+        #if file name does not contain "_uploaded" then push file
+        if '_uploaded' not in file:
+            file_path = os.path.join(path, file)
+            get_file_age_in_weeks(file_path)
 
     print('Run Complete')                                                      # Run Complete
     logging.info("Run Complete.")
@@ -202,3 +279,5 @@ while shutdown == 'False':                                                      
             print('System shutting down')
             time.sleep(5)
             #os.system("shutdown /s /t 1")
+
+
