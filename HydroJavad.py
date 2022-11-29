@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0,'C:\\Users\\tviolett\\Documents\\GitLab\\HydroJavadPy\\')
+sys.path.insert(0,'C:\\Users\\Trevor\\Desktop\\HydroJavadPy\\')
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -40,7 +40,6 @@ def push_file(file_path):
     time.sleep(8)
     #click "choose file" button with action chains
     driver.find_element(By.NAME, 'uploadfile').send_keys(file_path)
-
     #enter information in drop down menu
     elem = driver.find_element(By.ID, 'select2-ant_type-container').click()
     action.send_keys('JAVTRIUMPH_2A+P JVGR').perform()
@@ -77,6 +76,7 @@ def push_file(file_path):
         alert = driver.switch_to.alert
         alert.accept()
         print("alert accepted")
+        logging.info(file_path + ' File name unrecognized')
     except:
         print("no alert")
     
@@ -84,15 +84,15 @@ def push_file(file_path):
     time.sleep(5)
     text = driver.find_element(By.ID, 'container').text
     print(text)
-#if text contains "upload successful" then remove extension from filename
+    #if text contains "upload successful" then remove extension from filename
     if 'Upload successful' in text:
-        print('Upload successful')
+        logging.info(file_path + ' Uploaded successfully to OPUS.')
         file = os.path.splitext(file_path)[0]
         ext = os.path.splitext(file_path)[1]
         os.rename(file_path, file + '_uploaded' + ext)
-        print('File has been renamed')
+        logging.info('File has been renamed')
     else:
-        print('Upload unsuccessful')
+        logging.info(file_path + ' Upload to OPUS unsuccessful.')
         #store error to log file
         logging.error(text)
     driver.close()
@@ -102,7 +102,7 @@ global path
 currentmonth = datetime.now().month
 wateryear = sftp.CheckWY()
 
-path = 'C:\\Users\\tviolett\\Documents\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'                # Define path for data storage
+path = 'C:\\Users\\' + User + '\\Documents\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'                # Define path for data storage
 newpath = 1
 msg = ''
 sitedirname = SiteNumber + '_' + Site
