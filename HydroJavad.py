@@ -6,6 +6,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import logging
 import serial
 from config import ComA, BaudA, ComB, BaudB, Site, SiteNumber, User
@@ -16,6 +18,19 @@ import shutil
 import ftplib
 import sftp
 from OPUSh import push_file, get_file_age_in_weeks
+
+def configure_logger(path):
+    # Set the log file path
+    logfile = os.path.join(path, datetime.now().strftime('sample_%Y%m%d-%H%M')+".log")
+
+    # Set the log format
+    FORMAT = "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
+
+    # Configure the logger
+    logging.basicConfig(filename=logfile, format=FORMAT)
+    logger = logging.getLogger()
+    logger.setLevel(level=logging.INFO)
+
 
 def get_file_age_in_weeks(file_path):
     #file_path = os.path.join(path, file)
@@ -40,6 +55,7 @@ def push_file(file_path):
     time.sleep(8)
     #click "choose file" button with action chains
     driver.find_element(By.NAME, 'uploadfile').send_keys(file_path)
+
     #enter information in drop down menu
     elem = driver.find_element(By.ID, 'select2-ant_type-container').click()
     action.send_keys('JAVTRIUMPH_2A+P JVGR').perform()
@@ -61,22 +77,33 @@ def push_file(file_path):
     driver.find_element(By.NAME, 'Static').click()
     #if multiple alert boxes appears click OK in alert box
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
-        logging.info(file_path + ' File name unrecognized')
     except:
         print("no alert")
     
@@ -84,15 +111,16 @@ def push_file(file_path):
     time.sleep(5)
     text = driver.find_element(By.ID, 'container').text
     print(text)
-    #if text contains "upload successful" then remove extension from filename
+#if text contains "upload successful" then remove extension from filename
     if 'Upload successful' in text:
-        logging.info(file_path + ' Uploaded successfully to OPUS.')
+        print('Upload successful')
         file = os.path.splitext(file_path)[0]
         ext = os.path.splitext(file_path)[1]
-        os.rename(file_path, file + '_uploaded' + ext)
+        os.rename(file_path, file + '_opus' + ext)
         logging.info('File has been renamed')
+        print('File has been renamed')
     else:
-        logging.info(file_path + ' Upload to OPUS unsuccessful.')
+        print('Upload unsuccessful')
         #store error to log file
         logging.error(text)
     driver.close()
@@ -102,11 +130,13 @@ global path
 currentmonth = datetime.now().month
 wateryear = sftp.CheckWY()
 
-path = 'C:\\Users\\' + User + '\\Documents\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'                # Define path for data storage
+path = 'D:\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'                # Define path for data storage
 newpath = 1
 msg = ''
 sitedirname = SiteNumber + '_' + Site
 
+configure_logger(path)
+logger = logging.getLogger()
 
 try:                                                                        # Try to make the path by making new directory
     os.makedirs(path)
@@ -117,11 +147,11 @@ except OSError as error:                                                    # If
     newpath = 0
 
 
-logfile = os.path.join(path, datetime.now().strftime('sample_%Y%m%d-%H%M')+".log")
-FORMAT = "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
-logging.basicConfig(filename=logfile, format=FORMAT)
-logger = logging.getLogger()
-logger.setLevel(level=logging.INFO)
+#logfile = os.path.join(path, datetime.now().strftime('sample_%Y%m%d-%H%M')+".log")
+#FORMAT = "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
+#logging.basicConfig(filename=logfile, format=FORMAT)
+#logger = logging.getLogger()
+#logger.setLevel(level=logging.INFO)
 
 if newpath == -1:
     logging.info('New directory created.')
@@ -161,7 +191,7 @@ while SampleDur == 0 and (SampleGNSS != 0 or SampleGNSS != -1):                 
         ser2.flushOutput()
         time.sleep(60)                                                      # Delay 1 minute before returning to top of While loop as that's the scan rate of datalogger
     #elif bytesToRead > 3:                                                   # If we have more than 3 bytes, there are likely junk bytes. Expecting 12hr sampling (720 minutes)
-       # ser2.flushInput()                                                   # Flush ports
+    # ser2.flushInput()                                                   # Flush ports
         #ser2.flushOutput()
         #time.sleep(60)                                                      # Delay 1 minute before returning to top of While loop
     else:
@@ -169,7 +199,7 @@ while SampleDur == 0 and (SampleGNSS != 0 or SampleGNSS != -1):                 
         print(TestStr) #SampleDur = int(SampleDur)
         TestStr = TestStr.decode("utf-8")
         if TestStr.startswith('SID'):
-            splitdata = TestStr.split(",") # Change variable from tyep Bytes to type Integer
+            splitdata = TestStr.split(",") # Change variable from type Bytes to type Integer
             print(splitdata)                                                    # Print value to know how many bytes are expected
             SIDholder = splitdata[0].split(":")
             print(SIDholder)
@@ -201,7 +231,7 @@ if SampleGNSS == -1:
         logging.exception('Serial Port A Not Available')
 
 # Create timestamp string for file naming
-    fn = SiteNumber + "_" + Site + "_Javad_"                                                           # Define site ID for file naming -- Do this via communication to datalogger?
+    fn = SiteNumber + "_" + Site + "_"                                                           # Define site ID for file naming -- Do this via communication to datalogger?
     ext = ".jps"                                                                # Set raw file name extension from Javad to .jps
     jpsname = fn + timestr + ext                                                # Concatenate to make file name
     t_end = time.time()+ SampleDur * 60                                         # Set end time "t_end" to current time + user define minutes * 60s
@@ -219,10 +249,57 @@ if SampleGNSS == -1:
     print('Run Started')                                                        
     while time.time() < t_end:                                                  # While current time is less than end time
         bytesToRead = ser.inWaiting()                                           # Check buffer for bytes available
+        bytesToRead2 = ser2.inWaiting()                                         # Check buffer for bytes available in Datalogger port
         print(bytesToRead)                                                      # Print how many bytes are in buffer
+        print(bytesToRead2)                                                     # Print how many bytes are in buffer 2
         rl = ser.read(bytesToRead)                                              # Read number of bytes in buffer to "rl"
         print(rl)                                                               # Print the bytes
         file.write(rl)                                                          # Write the bytes to the open .jps file
+        while True:
+            try:
+                if bytesToRead2 > 0:                                                    # If there are bytes in the datalogger port
+                    DLStr = ser2.read_until('\n', bytesToRead2)                         # Read the bytes into DLStr
+                    if 'Shutdown' in DLStr:                                             # If the string "Shutdown" is in the bytes read
+                        logging.info('Shutdown command received')                       # Log that the shutdown command was received
+                        ser2.flush()                                                    # Flush the datalogger port
+                        ser2.write('Shutdown Received\r')                               # Send "Shutdown" back to datalogger
+                        ser2.flush()                                                    # Flush the datalogger port
+                        shutdown = 'True'                                               # Set shutdown variable to True
+                        ShutdownStr = DLStr                                             # Set ShutdownStr to the string received from datalogger
+                        break                                                           # Break out of the sample loop
+                    elif 'End Sample' in DLStr:                                         # If the string "End Sample" is in the bytes read
+                        logging.info('End Sample command received')                     # Log that the End Sample command was received
+                        ser2.flush()                                                    # Flush the datalogger port
+                        ser2.write('End Sample Received\r')                             # Send "End Sample" back to datalogger
+                        ser2.flush()                                                    # Flush the datalogger port
+                        t_end = time.time()                                             # Set end time to current time
+                        break                                                           # Break out of the sample loop
+                    elif DLStr.startswith('SID'):
+                        try:
+                            splitdata = DLStr.split(",")
+                            print(splitdata)                                                    # Print value to know how many bytes are expected
+                            SIDholder = splitdata[0].split(":")
+                            print(SIDholder)
+                            SID = SIDholder[1]
+                            print(SID)
+                            StationNum = splitdata[1]
+                            print(StationNum)
+                            SampleDur = splitdata[2]
+                            print(SampleDur)
+                            SampleDur = int(SampleDur)
+                            SampleDur = SampleDur * 60
+                            t_end = t_end + SampleDur
+                            logging.info('New Sample Duration Received')
+                            ser2.flush()
+                            ser2.write('Sample Info Received\r')
+                            ser2.flush()
+                        except:
+                            logging.exception('Error in Sample Info')
+                            ser2.flush()
+            except:
+                logging.exception('Error in Datalogger Port')
+                pass
+            input('Press Enter to continue...')                         
         time.sleep(2)                                                           # Delay 2 sec to ensure next message(s) are there for continuing While loop
 
     file.close()                                                                # After While loop finishes
@@ -231,7 +308,7 @@ if SampleGNSS == -1:
     ser.close()                                                                 # Close both serial port A
     os.system(cmdstr)                                                           # Output the command-line command to convert .jps to RINEX
 
-    numfiles = len([name for name in os.listdir(path) if name.endswith('o')]) # Check directory for files ending in "o" (indicating OPUS file), store the count in "numfiles"
+    numfiles = len([name for name in os.listdir(path) if name.endswith('o') if '_sftp' not in name]) # Check directory for files ending in "o" (indicating OPUS file), store the count in "numfiles"
     print(numfiles)
     numFiles = str(numfiles)
     logging.info(numFiles + ' files to push to FTP.')                                         # Print the number of OPUS files
@@ -263,21 +340,20 @@ while shutdown == 'False':                                                      
         ser2.flushOutput()
         time.sleep(60)                                                      # Delay 1 minute before returning to top of While loop as that's the scan rate of datalogger
     #elif bytesToRead > 3:                                                   # If we have more than 3 bytes, there are likely junk bytes. Expecting 12hr sampling (720 minutes)
-       # ser2.flushInput()                                                   # Flush ports
+    # ser2.flushInput()                                                   # Flush ports
         #ser2.flushOutput()
         #time.sleep(60)                                                      # Delay 1 minute before returning to top of While loop
     else:
+        if ShutdownStr == ('Shutdown'):
+            shutdown = 'True'
+            logging.info('System shutting down')
+            ser2.write('System shutting down\r')
+            print('System shutting down')
+            ser2.close()
+            time.sleep(5)
+            os.system("shutdown /s /t 1")
         ShutdownStr = ser2.read_until('\n', bytesToRead)                     # If not 0 or > 3 bytes from "inWaiting()", read number of bytes into SampleDur
         ShutdownStr = ShutdownStr.decode("utf-8")
         print(ShutdownStr) #SampleDur = int(SampleDur)
         ser2.flushInput()
         ser2.flushOutput()
-        if ShutdownStr == ('Shutdown'):
-            shutdown = 'True'
-            ser2.close()
-            logging.info('System shutting down')
-            print('System shutting down')
-            time.sleep(5)
-            #os.system("shutdown /s /t 1")
-
-

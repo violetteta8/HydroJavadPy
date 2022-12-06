@@ -1,13 +1,14 @@
 #click buttons and enter information in webpage
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 from datetime import datetime
 import os
-
-path = 'C:\\Users\\tviolett\\Documents\\Javad\\'
+import logging
 
 #if file is older than 2 weeks, return file path
 def get_file_age_in_weeks(file_path):
@@ -55,20 +56,32 @@ def push_file(file_path):
     driver.find_element(By.NAME, 'Static').click()
     #if multiple alert boxes appears click OK in alert box
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
     try:
+        alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
+        alert_text = alert.text
+        logging.info(alert_text)
         alert.accept()
+        logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
@@ -82,7 +95,8 @@ def push_file(file_path):
         print('Upload successful')
         file = os.path.splitext(file_path)[0]
         ext = os.path.splitext(file_path)[1]
-        os.rename(file_path, file + '_uploaded' + ext)
+        os.rename(file_path, file + '_opus' + ext)
+        logging.info('File has been renamed')
         print('File has been renamed')
     else:
         print('Upload unsuccessful')
