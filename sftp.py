@@ -2,13 +2,10 @@ import paramiko
 import os
 from datetime import datetime
 import time
-from config import Site, SiteNumber
+from config import Site, SiteNumber, path
 import logging
-from HydroJavad import configure_logger
+from loggerConfig import configure_logger
 
-log_dir = 'D:\\Javad\\' + SiteNumber + '_' + Site + '\\' + wateryear + '\\'
-configure_logger(log_dir)
-logger = logging.getLogger()
 
 def CheckWY():
     global wateryear
@@ -87,3 +84,11 @@ def sftpConnect(path):
         ssh_client.close()
     else:
         logging.error('Connection to sftp.usgs.gov failed, no files uploaded to sftp.usgs.gov')
+
+wateryear = None
+
+wateryear = CheckWY()
+
+path = path + wateryear + '\\'
+configure_logger(path)
+logger = logging.getLogger()
