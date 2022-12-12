@@ -166,6 +166,7 @@ def checkUpdates():
 
 currentmonth = datetime.now().month
 wateryear = sftp.CheckWY()
+path = path + wateryear + '\\'
 
 newpath = 1
 msg = ''
