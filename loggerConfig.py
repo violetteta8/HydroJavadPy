@@ -3,32 +3,29 @@ import os
 try:
     import sys
 
-    sys.path.insert(0,'C:\\Users\\tviolett\\Documents\\GitLab\\HydroJavadPy\\')
+    sys.path.insert(0,'C:\\Users\\Trevor\\Desktop\\HydroJavadPy\\')
 
     import logging
     from datetime import datetime
-    import config
+    from config import path
 
-    # def CheckWY():
-    #     global wateryear
-    #     currentyear = datetime.now().year
-    #     currentmonth = datetime.now().month
-    #     if currentmonth >= 10:
-    #         wy = str(currentyear + 1)
-    #         print(wy)
-    #     else:
-    #         wy = str(currentyear)
-    #         print(wy)
-    #     wateryear = 'WY' + wy
-    #     return(wateryear)
+    def CheckWY():
+        global wateryear
+        currentyear = datetime.now().year
+        currentmonth = datetime.now().month
+        if currentmonth >= 10:
+            wy = str(currentyear + 1)
+            print(wy)
+        else:
+            wy = str(currentyear)
+            print(wy)
+        wateryear = 'WY' + wy
+        return(wateryear)
 
-    # wateryear = None
-    # wateryear = CheckWY()
+    wateryear = None
+    wateryear = CheckWY()
 
-    # path = os.path.join(path, wateryear)
-
-    config.make_directory()
-
+    path = path + wateryear + '\\'
     datetime = datetime.now()
 
 

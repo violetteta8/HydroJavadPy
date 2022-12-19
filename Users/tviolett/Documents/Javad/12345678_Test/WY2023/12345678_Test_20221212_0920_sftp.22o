@@ -1,0 +1,41 @@
+     2.10           OBSERVATION DATA    G                   RINEX VERSION / TYPE
+JPS2RIN v.2.1.222   JAVAD GNSS          20221212 172309 UTC PGM / RUN BY / DATE
+-Unknown-           -Unknown-                               OBSERVER / AGENCY
+12345678_Test_20221212_0920                                 MARKER NAME
+027DFK9V69K3N0SQRYXQJAVAD TRIUMPH2      4.1.04-211206       REC # / TYPE / VERS
+ -2614424.7189 -4256121.9643  3952866.5342                  APPROX POSITION XYZ
+-Unknown-                                                   ANT # / TYPE
+        0.0000        0.0000        0.0000                  ANTENNA: DELTA H/E/N
+     1     1                                                WAVELENGTH FACT L1/2
+     9    C1    P1    L1    D1    S1    P2    L2    D2    S2# / TYPES OF OBSERV
+1000000.000                                                 INTERVAL
+  2022    12    12    17    23    0.0000000     GPS         TIME OF FIRST OBS
+  2022    12    12    17    23    0.0000000     GPS         TIME OF LAST OBS
+     7                                                      # OF SATELLITES
+   G 1     1     1     1     1     1     1     1     1     1PRN / # OF OBS
+   G 3     1     1     1     1     1     1     1     1     1PRN / # OF OBS
+   G 4     1     1     1     1     1     1     1     1     1PRN / # OF OBS
+   G21     1     0     1     1     1     0     0     0     0PRN / # OF OBS
+   G22     1     0     1     1     1     0     0     0     0PRN / # OF OBS
+   G26     1     0     1     1     1     0     0     0     0PRN / # OF OBS
+   G31     1     1     1     1     1     1     1     1     1PRN / # OF OBS
+L1 is phase on CA, L2 is phase on P2 (GPS & GLONASS)        COMMENT
+Phase shifts:                                               COMMENT
+G L1       NAN  07 G01 G03 G04 G21 G22 G26 G31              COMMENT
+G L2       NAN  04 G01 G03 G04 G31                          COMMENT
+                                                            END OF HEADER
+ 22 12 12 17 23  0.0000000  0  7G 1G 3G 4G21G22G26G31               -0.000090152
+  21751324.490    21751325.330   114304003.242 7     -2379.385          42.750
+  21751329.960    89068055.529 4     -1854.048          25.500
+  20706584.937    20706584.057   108813806.669 8      1571.661          47.750
+  20706582.847    84790009.800 4      1224.682          28.750
+  22231263.792    22231263.252   116826061.799 5      2084.305          33.750
+  22231260.892    91033291.998 4      1624.097          24.000
+  23075453.935                   121262271.893 6     -2580.915          37.000
+
+  22505539.133                   118267430.453 4     -2021.020          27.750
+
+  22671006.070                   119136965.330 4      2415.014          26.500
+
+  21313545.353    21313544.613   112003426.299 6     -2264.401          41.250
+  21313539.353    87275399.719 3     -1764.459          17.750

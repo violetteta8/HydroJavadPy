@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0,'C:\\Users\\tviolette\\Documents\\GitLab\\HydroJavadPy\\')
+sys.path.insert(0,'C:\\Users\\Trevor\\Desktop\\HydroJavadPy\\')
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys

@@ -30,7 +30,7 @@ try:
                 server = 'sftp.usgs.gov'
                 port = 22
                 user = 'usgs_nsoeder'
-                key = 'C:\\Users\\tviolett\\Documents\\sFTP\\usgs_nsoeder\\usgs_nsoeder_openssh'
+                key = 'C:\\Users\\Trevor\\Documents\\sFTP\\usgs_nsoeder\\usgs_nsoeder_openssh'
                 ssh_client.connect(server,port,user,key_filename = key,banner_timeout=200,auth_timeout=200)
                 ftp = ssh_client.open_sftp()
                 ftp.chdir()
