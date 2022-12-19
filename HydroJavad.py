@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0,'C:\\Users\\tviolett\\Documents\\GitLab\\HydroJavadPy\\')
+sys.path.insert(0,'C:\\Users\\tviolette\\Documents\\GitLab\\HydroJavadPy\\')
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -81,8 +81,8 @@ def push_file(file_path):
                 logging.info('Alert accepted')
                 alertpresent = True                                          #set alertpresent to true
                 if 'invalid' in alert_text or 'too many' in alert_text:     #if alert text contains invalid or too many, exit
-                        logging.info(alert_text)                            #log alert text
-                        return                                              #exit loop as these mean invalid file names
+                    logging.info(alert_text)                            #log alert text
+                    return                                              #exit loop as these mean invalid file names
                 continue                                                    #continue loop as these mean invalid file names
             except TimeoutException:
                 logging.info('No alert box')
@@ -173,9 +173,6 @@ msg = ''
 sitedirname = SiteNumber + '_' + Site                                       #create variable to name a directory "12345678_SID"
 
 
-configure_logger(path)                                                      #set up logger
-logger = logging.getLogger()
-
 try:                                                                        # Try to make the path by making new directory
     os.makedirs(path)
     newpath = -1
@@ -183,6 +180,9 @@ except OSError as error:                                                    # If
     print(error)                                                           # Print the error message
     msg = error
     newpath = 0
+
+configure_logger(path)                                                      #set up logger
+logger = logging.getLogger()
 
 if newpath == -1:
     logging.info('New directory created.')
