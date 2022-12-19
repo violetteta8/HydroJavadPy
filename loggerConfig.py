@@ -7,25 +7,28 @@ try:
 
     import logging
     from datetime import datetime
-    from config import path
+    import config
 
-    def CheckWY():
-        global wateryear
-        currentyear = datetime.now().year
-        currentmonth = datetime.now().month
-        if currentmonth >= 10:
-            wy = str(currentyear + 1)
-            print(wy)
-        else:
-            wy = str(currentyear)
-            print(wy)
-        wateryear = 'WY' + wy
-        return(wateryear)
+    # def CheckWY():
+    #     global wateryear
+    #     currentyear = datetime.now().year
+    #     currentmonth = datetime.now().month
+    #     if currentmonth >= 10:
+    #         wy = str(currentyear + 1)
+    #         print(wy)
+    #     else:
+    #         wy = str(currentyear)
+    #         print(wy)
+    #     wateryear = 'WY' + wy
+    #     return(wateryear)
 
-    wateryear = None
-    wateryear = CheckWY()
+    # wateryear = None
+    # wateryear = CheckWY()
 
-    path = path + wateryear + '\\'
+    # path = os.path.join(path, wateryear)
+
+    config.make_directory()
+
     datetime = datetime.now()
 
 
