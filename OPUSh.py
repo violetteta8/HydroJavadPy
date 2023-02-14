@@ -8,7 +8,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 from datetime import datetime
 import os
-import logging
+#import logging
 
 #if file is older than 2 weeks, return file path
 def get_file_age_in_weeks(file_path):
@@ -59,9 +59,9 @@ def push_file(file_path):
         alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
         alert_text = alert.text
-        logging.info(alert_text)
+        #logging.info(alert_text)
         alert.accept()
-        logging.info('Alert accepted')
+        #logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
@@ -69,9 +69,9 @@ def push_file(file_path):
         alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
         alert_text = alert.text
-        logging.info(alert_text)
+        #logging.info(alert_text)
         alert.accept()
-        logging.info('Alert accepted')
+        #logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
@@ -79,9 +79,9 @@ def push_file(file_path):
         alert = WebDriverWait(driver,5).until(EC.alert_is_present)
         alert = driver.switch_to.alert
         alert_text = alert.text
-        logging.info(alert_text)
+        #logging.info(alert_text)
         alert.accept()
-        logging.info('Alert accepted')
+        #logging.info('Alert accepted')
         print("alert accepted")
     except:
         print("no alert")
@@ -96,11 +96,14 @@ def push_file(file_path):
         file = os.path.splitext(file_path)[0]
         ext = os.path.splitext(file_path)[1]
         os.rename(file_path, file + '_opus' + ext)
-        logging.info('File has been renamed')
+        #logging.info('File has been renamed')
         print('File has been renamed')
     else:
         print('Upload unsuccessful')
         #store error to log file
-        logging.error(text)
+        #logging.error(text)
     driver.close()
 
+file_path = '/workspaces/HydroJavadPy/D/Javad/12345678_Test/WY2023/12345678_Test_20221212_0911_sftp.22o'
+get_file_age_in_weeks(file_path)
+push_file(file_path)
